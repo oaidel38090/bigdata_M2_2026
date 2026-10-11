@@ -1,12 +1,14 @@
 include:
-  - path: ./airflow/docker-compose.yml
-  - path: ./dbt/docker-compose.yml
+  - path: ./clickhouse/docker-compose.yml
   - path: ./hadoop/docker-compose.yml
-  - path: ./spark/docker-compose.yml
+  - path: ./jupyterlab/docker-compose.yml
+  - path: ./mongo/docker-compose.yml
+  - path: ./neo4j/docker-compose.yml
   - path: ./pgdw/docker-compose.yml
+  - path: ./redis/docker-compose.yml
   - path: ./s3/docker-compose.yml
-  - path: ./trino/docker-compose.yml
-
+  - path: ./spark/docker-compose.yml
+  
 services:
 
   init-network:

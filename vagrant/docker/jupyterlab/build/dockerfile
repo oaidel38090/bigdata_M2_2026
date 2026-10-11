@@ -1,0 +1,174 @@
+FROM spark:3.5.9-scala2.12-java17-python3-ubuntu
+
+USER root
+
+ARG HADOOP_VERSION=3.5.0
+
+# ============================================================
+# 1. Installation des outils système
+# ============================================================
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip \
+    python3-venv \
+    tini \
+    curl \
+    ca-certificates \
+    bash \
+    postgresql-client \
+    redis-tools \
+        gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+        arch="$(dpkg --print-architecture)"; \
+        if [ "${arch}" = arm64 ]; then focal_security_mirror=https://ports.ubuntu.com/ubuntu-ports; else focal_security_mirror=https://security.ubuntu.com/ubuntu; fi; \
+        curl -fsSL https://pgp.mongodb.com/server-4.4.asc \
+            | gpg --dearmor -o /usr/share/keyrings/mongodb-server-4.4.gpg; \
+        echo "deb [arch=${arch} signed-by=/usr/share/keyrings/mongodb-server-4.4.gpg] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" \
+            > /etc/apt/sources.list.d/mongodb-org-4.4.list; \
+        echo "deb [arch=${arch}] ${focal_security_mirror} focal-security main" \
+            > /etc/apt/sources.list.d/focal-security.list; \
+        apt-get update; \
+        apt-get install -y --no-install-recommends \
+            libssl1.1 \
+            mongodb-org-shell=4.4.31; \
+        rm -f /etc/apt/sources.list.d/mongodb-org-4.4.list \
+            /etc/apt/sources.list.d/focal-security.list \
+            /usr/share/keyrings/mongodb-server-4.4.gpg; \
+        rm -rf /var/lib/apt/lists/*
+
+
+# ============================================================
+# 2. Installation du client Hadoop HDFS
+# ============================================================
+
+RUN curl -fSL \
+    "https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz" \
+    -o /tmp/hadoop.tar.gz \
+    && mkdir -p /opt/hadoop \
+    && tar -xzf /tmp/hadoop.tar.gz \
+       -C /opt/hadoop --strip-components=1 \
+    && rm /tmp/hadoop.tar.gz
+
+ENV HADOOP_HOME=/opt/hadoop
+ENV HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+
+ENV PATH="/opt/hadoop/bin:/opt/spark/bin:/opt/spark/sbin:${PATH}"
+
+
+# ============================================================
+# 3. Configuration Spark / PySpark
+# ============================================================
+
+RUN mkdir -p /home/spark && chown -R spark:spark /home/spark
+ENV HOME=/home/spark
+ENV XDG_CONFIG_HOME=/home/spark/.config
+ENV XDG_DATA_HOME=/home/spark/.local/share
+ENV XDG_CACHE_HOME=/home/spark/.cache
+
+ENV PYSPARK_PYTHON=/usr/bin/python3
+ENV PYSPARK_DRIVER_PYTHON=/usr/bin/python3
+
+ENV PYTHONPATH="/opt/spark/python:/opt/spark/python/lib/py4j-0.10.9.7-src.zip"
+
+
+# ============================================================
+# 4. Installation des bibliothèques Python
+# ============================================================
+
+# PySpark est déjà fourni par l'image Spark.
+# Il n'est donc pas réinstallé avec pip.
+
+RUN pip3 install --no-cache-dir \
+    jupyterlab \
+    notebook \
+    ipykernel \
+    pandas \
+    numpy \
+    matplotlib \
+    pyarrow \
+    pymongo \
+    jupyterlab_myst \
+    boto3 \
+    s3fs \
+    awscli \
+    "psycopg[binary]" \
+    sqlalchemy \
+    clickhouse-connect \
+    hdfs \
+    neo4j \
+    redis
+
+
+
+# ============================================================
+# 5. Configuration de l'utilisateur
+# ============================================================
+
+# Harmonisation UID/GID avec les volumes de la VM Ubuntu
+
+RUN usermod -u 1000 spark && \
+    groupmod -g 1000 spark
+
+RUN mkdir -p /home/spark \
+    && chown -R spark:spark /home/spark
+
+ENV HOME=/home/spark
+
+ENV XDG_CONFIG_HOME=/home/spark/.config
+ENV XDG_DATA_HOME=/home/spark/.local/share
+ENV XDG_CACHE_HOME=/home/spark/.cache
+
+RUN mkdir -p \
+    /opt/spark/conf \
+    /workspace \
+    /home/spark/.jupyter \
+    /data \
+    && chown -R spark:spark \
+       /workspace \
+       /home/spark \
+       /data
+
+
+# ============================================================
+# 6. Configuration du terminal JupyterLab
+# ============================================================
+
+RUN printf \
+    "c.ServerApp.terminado_settings = {'shell_command': ['/bin/bash']}\n" \
+    > /home/spark/.jupyter/jupyter_server_config.py \
+    && chown -R spark:spark /home/spark/.jupyter
+
+
+# ============================================================
+# 7. Vérification des outils
+# ============================================================
+
+RUN java -version \
+    && hadoop version \
+    && spark-submit --version \
+    && mongo --version \
+    && redis-cli --version \
+    && python3 -c \
+       "import boto3, psycopg, jupyterlab; print('Clients Python OK')"
+
+
+# ============================================================
+# 8. Démarrage JupyterLab
+# ============================================================
+
+WORKDIR /workspace
+
+USER spark
+
+EXPOSE 8888
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+
+CMD ["python3", "-m", "jupyterlab", \
+     "--ip=0.0.0.0", \
+     "--port=8888", \
+     "--no-browser",\
+     "--ServerApp.token=", \
+     "--ServerApp.password="]

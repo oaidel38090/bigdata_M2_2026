@@ -1,0 +1,75 @@
+# ####################################################################
+# ################### CONFIGURATION VARIABLES ########################
+# ####################################################################
+IMAGE_NAME = "bento/ubuntu-22.04"   # Image to use
+BOX_VERSION = "202510.26.0"        # Box version
+MEM = 8096                          #vagrant Amount of RAM
+CPU = 4                             # Number of processors (Minimum value of 2 otherwise it will not work)
+MASTER_NAME="vmad01"                # Master node name
+NODE_NETWORK_BASE = "192.168.56"    # First three octets of the IP address that will be assign to all type of nodes
+
+
+
+
+Vagrant.configure("2") do |config|
+    # Disable automatic SSH key insertion
+    config.ssh.insert_key = false
+    # Shared folder from host to guest
+    config.vm.synced_folder "../../../", "/monpc"
+
+    # RAM and CPU config
+    config.vm.provider "virtualbox" do |v|
+        v.memory = MEM
+        v.cpus = CPU
+    end
+
+    # Master node config
+    config.vm.define MASTER_NAME do |master|
+
+        # Hostname and network config
+        master.vm.box = IMAGE_NAME
+        master.vm.box_version = BOX_VERSION
+        master.vm.network "private_network", ip: "#{NODE_NETWORK_BASE}.30"
+        master.vm.hostname = MASTER_NAME
+        #master.vm.network "forwarded_port", guest: 8888, host: 8888, auto_correct: true # Port for Jupyter Notebook
+        #master.vm.network "forwarded_port", guest: 5432, host: 5432, auto_correct: true # Port for PostgreSQL
+        #master.vm.network "forwarded_port", guest: 80, host: 80, auto_correct: true # Port pour pgadmin
+        #master.vm.network "forwarded_port", guest: 8443, host: 8443, auto_correct: true # Port for Dashboard Ceph
+        #master.vm.network "forwarded_port", guest: 7480, host: 7480, auto_correct: true  # Port for Dashboard Ceph    
+        # Ansible role setting
+        master.vm.provision "ansible_local" do |ansible|
+
+            # Ansbile role that will be launched
+            ansible.playbook = "roles/client.yml"
+            ansible.galaxy_role_file = "requirements.yml"
+            # Groups in Ansible inventory
+            ansible.groups = {
+                "masters" => ["#{MASTER_NAME}"]
+            }
+
+        end
+
+        master.vm.provision "shell", privileged: true, inline: <<~SHELL
+            cat >/etc/systemd/system/docker-compose-start.service <<'EOF'
+            [Unit]
+            Description=Start Docker Compose environment
+            Requires=docker.service
+            After=docker.service
+            RequiresMountsFor=/monpc
+
+            [Service]
+            Type=oneshot
+            User=vagrant
+            WorkingDirectory=/monpc/vagrant/docker
+            ExecStart=/bin/sh /monpc/vagrant/docker/start.sh
+            RemainAfterExit=yes
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+
+            systemctl daemon-reload
+            systemctl enable --now docker-compose-start.service
+        SHELL
+    end
+end

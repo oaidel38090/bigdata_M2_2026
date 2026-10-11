@@ -1,0 +1,47 @@
+services:
+
+#######################################
+# Configuration S3    #
+#######################################
+
+  minio:
+    image: quay.io/minio/minio
+    profiles: [s3]
+    container_name: minio
+    ports:
+      - "9000:9000"  # API S3
+      - "9001:9001"  # Console Web
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - datalab
+
+  awscli:
+    container_name: "awscli"
+    image: amazon/aws-cli
+    profiles: [s3, aws]
+    networks:
+      - datalab
+
+####################################
+# Déclaration du réseau     #
+####################################
+# L'ensemble des containers sera enregistré dans le réseau datalab
+# la résolution de nom sera utilisé pour les communications entre containers
+
+networks:
+  datalab:
+    external: true
+    name: datalab
+
+####################################
+# Déclaration des volumes minio    #
+####################################
+# Pour rendre persistant les données celles-ci seront conservé dans des volumes
+
+volumes:
+  minio-data:

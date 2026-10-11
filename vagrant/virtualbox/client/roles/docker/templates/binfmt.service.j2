@@ -1,0 +1,12 @@
+[Unit]
+Description=Enable Docker multi-arch binfmt
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker run --privileged --rm tonistiigi/binfmt --install all
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

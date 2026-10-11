@@ -1,0 +1,12 @@
+[Unit]
+Description=Jupyter Lab
+[Service]
+Type=simple
+PIDFile=/run/jupyter.pid
+ExecStart=/home/vagrant/.local/bin/jupyter-lab --config=/home/vagrant/.jupyter/jupyter_server_config.py
+User=vagrant
+Group=vagrant
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=multi-user.target

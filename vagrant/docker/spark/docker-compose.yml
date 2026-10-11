@@ -1,0 +1,81 @@
+services:
+  smaster:
+    image: spark:3.5.9-scala2.12-java17-python3-ubuntu 
+    profiles: [spark]
+    container_name: smaster
+    hostname: smaster
+    command: >
+      /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+      --host smaster
+      --port 7077
+      --webui-port 8080
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    volumes:
+      - /monpc/vagrant/docker/jupyterlab/jars/postgresql-42.7.3.jar:/opt/spark/jars/postgresql-41.7.3.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/aws-java-sdk-bundle-1.12.262.jar:/opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/hadoop-aws-3.3.4.jar:/opt/spark/jars/hadoop-aws-3.3.4.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/delta-spark_2.12-3.2.0.jar:/opt/spark/jars/delta-spark_2.12-3.2.0.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/delta-storage-3.2.0.jar:/opt/spark/jars/delta-storage-3.2.0.jar:ro
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+    networks:
+      - datalab
+
+  sworker1:
+    image: spark:3.5.9-scala2.12-java17-python3-ubuntu
+    profiles: [spark]
+    container_name: sworker1
+    hostname: sworker1
+    depends_on:
+      - smaster
+    command: >
+      /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker
+      spark://smaster:7077
+      --webui-port 8081
+      --cores 2
+      --memory 2g
+    ports:
+      - "8081:8081"
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+    volumes:
+      - /monpc/vagrant/docker/jupyterlab/jars/postgresql-42.7.3.jar:/opt/spark/jars/postgresql-41.7.3.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/aws-java-sdk-bundle-1.12.262.jar:/opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/hadoop-aws-3.3.4.jar:/opt/spark/jars/hadoop-aws-3.3.4.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/delta-spark_2.12-3.2.0.jar:/opt/spark/jars/delta-spark_2.12-3.2.0.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/delta-storage-3.2.0.jar:/opt/spark/jars/delta-storage-3.2.0.jar:ro
+    networks:
+      - datalab
+
+  sworker2:
+    image: spark:3.5.9-scala2.12-java17-python3-ubuntu
+    profiles: [spark]
+    container_name: sworker2
+    hostname: sworker2
+    depends_on:
+      - smaster
+    command: >
+      /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker
+      spark://smaster:7077
+      --webui-port 8082
+      --cores 2
+      --memory 2g
+    ports:
+      - "8082:8082"
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+    volumes:
+      - /monpc/vagrant/docker/jupyterlab/jars/postgresql-42.7.3.jar:/opt/spark/jars/postgresql-42.7.3.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/aws-java-sdk-bundle-1.12.262.jar:/opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/hadoop-aws-3.3.4.jar:/opt/spark/jars/hadoop-aws-3.3.4.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/delta-spark_2.12-3.2.0.jar:/opt/spark/jars/delta-spark_2.12-3.2.0.jar:ro
+      - /monpc/vagrant/docker/jupyterlab/jars/delta-storage-3.2.0.jar:/opt/spark/jars/delta-storage-3.2.0.jar:ro
+    networks:
+      - datalab
+
+networks:
+  datalab:
+    external: true
+    name: datalab

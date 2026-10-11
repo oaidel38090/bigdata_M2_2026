@@ -1,0 +1,16 @@
+hadoop_version: "3.3.6"
+
+hadoop_url: "http://ftp.riken.jp/net/apache/hadoop/common/hadoop-{{ hadoop_version }}/hadoop-{{ hadoop_version }}.tar.gz"
+
+hadoop_src_dir: "/soft/src"
+hadoop_home: "/soft/app/hadoop"
+
+common_packages:
+  - ca-certificates
+  - curl
+  - gnupg
+  - openjdk-11-jdk
+  - openssh-client
+  - rsync
+  - wget
+  - sshpass

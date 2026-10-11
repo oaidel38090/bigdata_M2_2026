@@ -1,0 +1,235 @@
+services:
+
+
+
+#################################
+# SERVEUR MONO-INSTANCE Mongo
+#################################<
+
+  mongosingle:
+    image: mongo:4.4.6
+    container_name: mongosingle
+    profiles: [mongo]]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongosingle-data:/data/db
+      - ./mongodb:/dataimport
+    networks:
+      - datalab
+
+  loaddatamoviesintomongosingle:
+    image: mongo:4.4.6
+    # this container will exit after executing the command
+    profiles: [mongo]]
+    restart: "no"
+    depends_on:
+      - mongosingle
+    volumes:
+      - ./mongodb:/dataimport
+    networks:
+      - datalab
+    command: >
+      mongoimport --uri 'mongodb://mongosingle:27017' --drop -d training -c movies --jsonArray /dataimport/movies.json
+
+  loaddatazipsintomongosingle:
+    image: mongo:4.4.6
+    # this container will exit after executing the command
+    restart: "no"
+    profiles: [mongo]]
+    depends_on:
+      - mongosingle
+    volumes:
+      - ./mongodb:/dataimport
+    networks:
+      - datalab
+    command: >
+      mongoimport --db training --collection "zips" --drop --type json --host "mongosingle:27017"  --file "/dataimport/zips.json"
+
+  loaddatausersintomongosingle:
+    image: mongo:4.4.6
+    # this container will exit after executing the command
+    restart: "no"
+    profiles: [mongo]]
+    depends_on:
+      - mongosingle
+    volumes:
+      - ./mongodb:/dataimport
+    networks:
+      - datalab
+    command: >
+      mongoimport --uri 'mongodb://mongosingle:27017' --drop -d singlepattern -c users --jsonArray /dataimport/users.json
+
+  loaddatareviewsintomongosingle:
+    image: mongo:4.4.6
+    # this container will exit after executing the command
+    restart: "no"
+    profiles: [mongo]]
+    depends_on:
+      - mongosingle
+    volumes:
+      - ./mongodb:/dataimport
+    networks:
+      - datalab
+    command: >
+      mongoimport --uri 'mongodb://mongosingle:27017' --drop -d singlepattern -c reviews --jsonArray /dataimport/reviews.json
+
+  loaddatabooksintomongosingle:
+    profiles: [mongo]]
+    image: mongo:4.4.6
+    # this container will exit after executing the command
+    restart: "no"
+    depends_on:
+      - mongosingle
+    volumes:
+      - ./mongodb:/dataimport
+    networks:
+      - datalab
+    command: >
+      mongoimport --uri 'mongodb://mongosingle:27017' --drop -d singlepattern -c books --jsonArray /dataimport/books.json
+
+  loaddatatripsintomongosingle:
+    profiles: [mongo]]
+    image: mongo:4.4.6
+    # this container will exit after executing the command
+    restart: "no"
+    depends_on:
+      - mongosingle
+    volumes:
+      - ./mongodb:/dataimport
+    networks:
+      - datalab
+    command: >
+      mongoimport --db training --collection "trips" --drop --type json --host "mongosingle:27017"  --file "/dataimport/trips.json"
+
+  loaddatacompaniesintomongosingle:
+    profiles: [mongo]]
+    image: mongo:4.4.6
+    # this container will exit after executing the command
+    restart: "no"
+    depends_on:
+      - mongosingle
+    volumes:
+      - ./mongodb:/dataimport
+    networks:
+      - datalab
+    command: >
+      mongoimport --db training --collection "companies" --drop --type json --host "mongosingle:27017"  --file "/dataimport/companies.json"
+
+
+#######################################################
+# Configuration d'un cluster MongoDB en replicaset    #
+#######################################################
+
+  mongo1:
+    container_name: mongo1
+    hostname: mongo1
+    profiles: [mongoreplicaset]]
+    image: mongo:4.4.6
+    ports:
+      - 30001:27017
+    command: mongod --replSet my-mongo-set
+    healthcheck:
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    volumes:
+      - mongo1-data:/data/db
+    networks:
+      - datalab
+
+  mongo2:
+    container_name: mongo2
+    hostname: mongo2
+    image: mongo:4.4.6
+    profiles: [mongoreplicaset]]
+    ports:
+      - 30002:27017
+    command: mongod --replSet my-mongo-set
+    healthcheck:
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    volumes:
+      - mongo2-data:/data/db
+    networks:
+      - datalab
+
+  mongo3:
+    container_name: mongo3
+    hostname: mongo3
+    profiles: [mongoreplicaset]]
+    image: mongo:4.4.6
+    ports:
+      - 30003:27017
+    command: mongod --replSet my-mongo-set
+    healthcheck:
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    volumes:
+      - mongo3-data:/data/db
+    networks:
+      - datalab
+
+# finally, we can define the initialization server
+# this runs the `rs.initiate` command to intialize
+# the replica set and connect the three servers to each other
+  mongoinit:
+    image: mongo:4.4.6
+    profiles: [mongoreplicaset]]
+    # this container will exit after executing the command
+    restart: "no"
+    depends_on:
+      mongo1:
+        condition: service_healthy
+      mongo2:
+        condition: service_healthy
+      mongo3:
+        condition: service_healthy
+    networks:
+      - datalab
+    command: >
+      mongo --host mongo1:27017 --eval
+      '
+      config = {
+      "_id" : "my-mongo-set",
+      "members" : [
+        {
+          "_id" : 0,
+          "host" : "mongo1:27017"
+        },
+        {
+          "_id" : 1,
+          "host" : "mongo2:27017"
+        },
+        {
+          "_id" : 2,
+          "host" : "mongo3:27017"
+        }
+      ]
+      };
+      rs.initiate(config);
+      '
+
+volumes:
+  mongosingle-data: {}
+  mongo1-data: {}
+  mongo2-data: {}
+  mongo3-data: {}
+  shard1s1: {}
+  shard1s2: {}
+  shard1s3: {}
+  shard2s1: {}
+  shard2s2: {}
+  shard2s3: {}
+  configs1: {}
+  configs2: {}
+  configs3: {}
+

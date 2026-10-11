@@ -1,0 +1,4 @@
+{
+  "live-restore": true,
+  "exec-opts": ["native.cgroupdriver=systemd"]
+}

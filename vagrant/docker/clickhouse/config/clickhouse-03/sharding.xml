@@ -1,0 +1,31 @@
+<clickhouse>
+    <!-- TP M2 : trois shards, un seul exemplaire des données par shard. -->
+    <remote_servers>
+        <datalab_sharded>
+            <shard>
+                <replica>
+                    <host>clickhouse-01</host>
+                    <port>9000</port>
+                    <user>clickhouseanf</user>
+                    <password>anfnosql2026</password>
+                </replica>
+            </shard>
+            <shard>
+                <replica>
+                    <host>clickhouse-02</host>
+                    <port>9000</port>
+                    <user>clickhouseanf</user>
+                    <password>anfnosql2026</password>
+                </replica>
+            </shard>
+            <shard>
+                <replica>
+                    <host>clickhouse-03</host>
+                    <port>9000</port>
+                    <user>clickhouseanf</user>
+                    <password>anfnosql2026</password>
+                </replica>
+            </shard>
+        </datalab_sharded>
+    </remote_servers>
+</clickhouse>

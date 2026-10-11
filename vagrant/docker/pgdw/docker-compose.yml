@@ -1,0 +1,30 @@
+services:
+  pgdw:
+    image: postgres:17
+    profiles: [pgdw]
+    container_name: pgdw
+    hostname: pgdw
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=warehouse
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdw_data:/var/lib/postgresql/data
+    networks:
+      - datalab
+
+volumes:
+  pgdw_data:
+
+####################################
+# Déclaration du réseau     #
+####################################
+# L'ensemble des containers sera enregistré dans le réseau datalab
+# la résolution de nom sera utilisé pour les communications entre containers
+
+networks:
+  datalab:
+    external: true
+    name: datalab

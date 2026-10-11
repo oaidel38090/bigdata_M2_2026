@@ -1,0 +1,5 @@
+- hosts: masters
+  become: yes
+  roles:
+    - { role: common }
+    - { role: docker }

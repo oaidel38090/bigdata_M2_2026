@@ -1,0 +1,119 @@
+- name: Add new repositories keys
+  apt_key:
+    url="{{item.key}}"
+    state=present
+  with_items: "{{ gpg_keys | default([]) }}"
+
+- name: Add new apt repositories
+  apt_repository:
+    repo="{{item.repo}}"
+    state=present
+  with_items: "{{ repositories | default([]) }}"
+
+- name: Install docker
+  apt: 
+    name="{{ item.name }}"
+    state=present
+    update_cache=yes
+  with_items: "{{ docker_packages | default([]) }}"
+  notify:
+    - docker status
+
+- name: Change Docker cgroup driver - Create daemon.json file
+  file:
+    path: "/etc/docker/daemon.json"
+    state: touch
+
+- name: Ajouter vagrant au groupe docker (équivalent usermod -aG)
+  become: true
+  ansible.builtin.user:
+    name: vagrant
+    groups: docker
+    append: yes
+
+
+# Disable swap - Kubernetes requirement + Docker recommendation
+- name: Remove swapfile from /etc/fstab
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  with_items:
+    - swap
+    - none
+
+# Disable swap immediately
+- name: Disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: Change Docker cgroup driver - Create daemon.json file
+  file:
+    path: "/etc/docker/daemon.json"
+    state: touch
+
+- name: Copier daemon.json vers /etc/docker/
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart docker
+
+- name: Disable docker.socket
+  ansible.builtin.systemd:
+    name: docker.socket
+    enabled: false
+    state: stopped
+
+- name: Restart service docker
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker
+
+- name: Check for legacy binfmt service
+  stat:
+    path: /etc/systemd/system/binfmt-docker.service
+  register: legacy_binfmt_service
+
+- name: Disable legacy binfmt service
+  systemd:
+    name: binfmt-docker
+    enabled: false
+    state: stopped
+  when: legacy_binfmt_service.stat.exists
+
+- name: Ensure docker networks exist
+  community.docker.docker_network:
+    name: datalab
+
+- name: Pull images s3
+  ansible.builtin.command:
+    cmd: docker compose pull --ignore-pull-failures
+    chdir: /monpc/vagrant/docker/s3
+
+- name: Start Jupyter stack
+  community.docker.docker_compose_v2:
+    project_src: /monpc/vagrant/docker/jupyterlab
+    state: present
+
+- name: Pull images
+  ansible.builtin.find:
+    paths: /monpc/vagrant/docker
+    patterns: "docker-compose.yml"
+    recurse: true
+  register: compose_files
+
+- name: Show found files
+  debug:
+    msg: "{{ item.path }}"
+  loop: "{{ compose_files.files }}"
+
+- name: Pull images for each compose project
+  ansible.builtin.command:
+    cmd: docker compose pull
+    chdir: "{{ item.path | dirname }}"
+  loop: "{{ compose_files.files }}"
+

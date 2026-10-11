@@ -1,0 +1,34 @@
+services:
+  jupyter:
+    image: guizmo38/bigdata-jupyterlab:1.0
+    build:
+      context: ./build
+      dockerfile: dockerfile
+    container_name: jupyter
+    restart: unless-stopped
+    ports:
+      - "9999:8888"
+      - "4040:4040"
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      SPARK_MASTER: "spark://smaster:7077"
+      HADOOP_USER_NAME: "root"
+      PYSPARK_PYTHON: "/usr/bin/python3"
+      PYSPARK_DRIVER_PYTHON: "/usr/bin/python3"
+      HADOOP_CONF_DIR: "/opt/spark/conf"
+    volumes:
+      - ../../../:/workspace/
+      - ./jars/postgresql-42.7.3.jar:/opt/spark/jars/postgresql-42.7.3.jar:ro
+      - ./jars/hadoop-aws-3.3.4.jar:/opt/spark/jars/hadoop-aws-3.3.4.jar:ro
+      - ./jars/aws-java-sdk-bundle-1.12.262.jar:/opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar:ro
+      - ../spark/conf/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf:ro
+      - ../spark/conf/core-site.xml:/opt/spark/conf/core-site.xml:ro
+      - ./jars/delta-spark_2.12-3.2.0.jar:/opt/spark/jars/delta-spark_2.12-3.2.0.jar:ro
+      - ./jars/delta-storage-3.2.0.jar:/opt/spark/jars/delta-storage-3.2.0.jar:ro
+    networks:
+      - datalab
+
+networks:
+  datalab:
+    external: true
+    name: datalab

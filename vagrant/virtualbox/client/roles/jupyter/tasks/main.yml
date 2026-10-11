@@ -1,0 +1,74 @@
+- name: Install  packages that allow jupyter to be installed 
+  apt: 
+    name="{{ item.name }}"
+    state=present
+    update_cache=yes
+  with_items: "{{ jupyter_packages | default([]) }}"
+
+- name: Installer JupyterLab et extensions
+  pip:
+    name:
+      - "prettytable<3"
+      - jupyterlab
+      - jupyterlab-myst
+      - ipython
+      - ipython-sql 
+      - sqlalchemy
+      - psycopg2-binary
+      - pandas
+    executable: pip3
+    extra_args: --user
+  become: true
+  become_user: vagrant
+
+- name: Ajouter ~/.local/bin au PATH dans .bashrc
+  lineinfile:
+    path: /home/vagrant/.bashrc
+    line: 'export PATH=$PATH:/home/vagrant/.local/bin/'
+    insertafter: EOF
+  become: true
+
+- name: Créer le dossier de config Jupyter
+  file:
+    path: /home/vagrant/.jupyter
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+
+- name: Générer le fichier de config Jupyter
+  command: /home/vagrant/.local/bin/jupyter server --generate-config
+  become: true
+  become_user: vagrant
+  args:
+    creates: /home/vagrant/.jupyter/jupyter_server_config.py
+
+- name: Copier le fichier jupyter_server_config.py
+  copy:
+    src: jupyter_server_config.py
+    dest: /home/vagrant/.jupyter/jupyter_server_config.py
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+
+- name: Copier le service systemd jupyterlab
+  copy:
+    src: jupyterlab.service
+    dest: /etc/systemd/system/jupyterlab.service
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+
+- name: Recharger systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Activer le service jupyterlab
+  systemd:
+    name: jupyterlab
+    enabled: no
+
+- name: Démarrer le service jupyterlab
+  systemd:
+    name: jupyterlab
+    state: stopped

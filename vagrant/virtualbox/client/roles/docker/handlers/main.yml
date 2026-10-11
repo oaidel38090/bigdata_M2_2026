@@ -1,0 +1,15 @@
+# Handlers for common role
+
+# Docker service handler
+# Start docker service
+- name: docker status
+  service: 
+    name: docker 
+    state: started
+
+# Restart docker service
+- name: restart docker
+  service: 
+    name: docker 
+    state: restarted 
+    daemon_reload: yes

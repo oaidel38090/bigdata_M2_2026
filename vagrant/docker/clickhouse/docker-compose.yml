@@ -1,0 +1,103 @@
+services:
+
+  clickhouse-01:
+    image: clickhouse/clickhouse-server:25.8
+    container_name: clickhouse-01
+    hostname: clickhouse-01
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    environment:
+      CLICKHOUSE_USER: clickhouseanf
+      CLICKHOUSE_PASSWORD: anfnosql2026
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data_01:/var/lib/clickhouse
+      - clickhouse_logs_01:/var/log/clickhouse-server
+      - ./config/clickhouse-01:/etc/clickhouse-server/config.d
+    networks:
+      - datalab
+    depends_on:
+      - clickhouse-keeper
+    restart: unless-stopped
+
+  clickhouse-02:
+    image: clickhouse/clickhouse-server:25.8
+    container_name: clickhouse-02
+    hostname: clickhouse-02
+    ports:
+      - "8124:8123"
+      - "9001:9000"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    environment:
+      CLICKHOUSE_USER: clickhouseanf
+      CLICKHOUSE_PASSWORD: anfnosql2026
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data_02:/var/lib/clickhouse
+      - clickhouse_logs_02:/var/log/clickhouse-server
+      - ./config/clickhouse-02:/etc/clickhouse-server/config.d
+    networks:
+      - datalab
+    depends_on:
+      - clickhouse-keeper
+    restart: unless-stopped
+
+  clickhouse-03:
+    image: clickhouse/clickhouse-server:25.8
+    container_name: clickhouse-03
+    hostname: clickhouse-03
+    ports:
+      - "8125:8123"
+      - "9002:9000"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    environment:
+      CLICKHOUSE_USER: clickhouseanf
+      CLICKHOUSE_PASSWORD: anfnosql2026
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data_03:/var/lib/clickhouse
+      - clickhouse_logs_03:/var/log/clickhouse-server
+      - ./config/clickhouse-03:/etc/clickhouse-server/config.d
+    networks:
+      - datalab
+    depends_on:
+      - clickhouse-keeper
+    restart: unless-stopped
+
+  clickhouse-keeper:
+    image: clickhouse/clickhouse-keeper:25.8
+    container_name: clickhouse-keeper
+    hostname: clickhouse-keeper
+    ports:
+      - "9181:9181"
+    volumes:
+      - ./config/keeper/keeper_config.xml:/etc/clickhouse-keeper/keeper_config.xml
+      - keeper_data:/var/lib/clickhouse
+    networks:
+      - datalab
+    restart: unless-stopped
+
+networks:
+  datalab:
+    name: datalab
+    driver: bridge
+
+volumes:
+  clickhouse_data_01:
+  clickhouse_data_02:
+  clickhouse_data_03:
+  clickhouse_logs_01:
+  clickhouse_logs_02:
+  clickhouse_logs_03:
+  keeper_data:

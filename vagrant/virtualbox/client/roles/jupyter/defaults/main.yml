@@ -1,0 +1,9 @@
+# Définiton des variables par défaut pour le rôle "jupyter"
+---
+
+# Jupyter packages to install
+jupyter_packages:
+- name: python3
+- name: python3-pip 
+- name: nodejs
+- name: jq

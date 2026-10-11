@@ -1,0 +1,4 @@
+spark_version: "4.1.1"
+spark_url: "https://downloads.apache.org/spark/spark-{{ spark_version }}/spark-{{ spark_version }}-bin-hadoop3.tgz"
+spark_src_dir: "/soft/src"
+spark_home: "/soft/app/spark"

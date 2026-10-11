@@ -1,0 +1,7 @@
+# ================================
+# 🔑 Ansible global configuration
+# ================================
+
+# Forcer l'interpréteur Python utilisé par Ansible
+# CRITIQUE pour psycopg2 + Ubuntu + Vagrant
+ansible_python_interpreter: /usr/bin/python3

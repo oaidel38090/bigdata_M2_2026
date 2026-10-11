@@ -1,0 +1,75 @@
+- name: Install common packages
+  apt:
+    name: "{{ common_packages }}"
+    state: present
+    update_cache: yes
+
+- name: Configure cluster hosts
+  become: yes
+  blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} HADOOP CLUSTER"
+    block: |
+      192.168.56.10 client
+      192.168.56.20 master
+      192.168.56.21 node1
+      192.168.56.22 node2
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: "0755"
+  loop:
+    - "{{ hadoop_src_dir }}"
+    - "{{ hadoop_home }}"
+    - /soft/app
+
+
+- name: Download Hadoop
+  get_url:
+    url: "{{ hadoop_url }}"
+    dest: "{{ hadoop_src_dir }}/hadoop-{{ hadoop_version }}.tar.gz"
+    mode: "0644"
+
+
+- name: Extract Hadoop
+  unarchive:
+    src: "{{ hadoop_src_dir }}/hadoop-{{ hadoop_version }}.tar.gz"
+    dest: "{{ hadoop_home }}"
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+
+
+- name: Copy Hadoop configuration
+  copy:
+    src: "{{ item }}"
+    dest: "{{ hadoop_home }}/etc/hadoop/{{ item }}"
+  loop:
+    - core-site.xml
+    - yarn-site.xml
+
+
+- name: Detect JAVA_HOME
+  shell: readlink -f $(update-alternatives --list java) | sed 's:/bin/java::'
+  register: java_home
+
+
+- name: Set JAVA_HOME in hadoop-env.sh
+  lineinfile:
+    path: "{{ hadoop_home }}/etc/hadoop/hadoop-env.sh"
+    regexp: "^export JAVA_HOME"
+    line: "export JAVA_HOME={{ java_home.stdout }}"
+
+
+- name: Set Hadoop env variables
+  blockinfile:
+    path: /home/vagrant/.bashrc
+    block: |
+      export HADOOP_HOME={{ hadoop_home }}
+      export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+      export JAVA_HOME={{ java_home.stdout }}
+    marker: "# {mark} HADOOP ENV"
+  become_user: vagrant

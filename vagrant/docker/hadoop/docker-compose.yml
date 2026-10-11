@@ -1,0 +1,84 @@
+services:
+  hadoop-client:
+    image: apache/hadoop:3.5.0
+    container_name: hadoop-client
+    profiles: ["hadoop-client"]
+    stdin_open: true
+    tty: true
+    command: bash
+    environment:
+      HADOOP_USER_NAME: "root"
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+      HADOOP_CLASSPATH: /opt/hadoop/share/hadoop/tools/lib/*    
+    volumes:
+      - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
+      - ./hadoop-conf/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml:ro
+      - ../../../data:/data
+    networks:
+      - datalab
+
+  namenode:
+    image: apache/hadoop:3.5.0
+    profiles: [hadoop]
+    container_name: namenode
+    hostname: namenode
+    user: root
+    restart: unless-stopped
+    volumes:
+      - ./hadoop-conf:/opt/hadoop/etc/hadoop:ro
+      - ./scripts/start-namenode.sh:/start-namenode.sh:ro
+      - namenode_data:/hadoop/dfs/name
+    ports:
+      - "9870:9870"
+      - "9010:9000"
+    command: ["/bin/bash", "/start-namenode.sh"]
+    networks:
+      - datalab
+
+  datanode1:
+    image: apache/hadoop:3.5.0
+    profiles: [hadoop]
+    container_name: datanode1
+    hostname: datanode1
+    user: root
+    restart: unless-stopped
+    depends_on:
+      - namenode
+    volumes:
+      - ./hadoop-conf:/opt/hadoop/etc/hadoop:ro
+      - ./scripts/start-datanode.sh:/start-datanode.sh:ro
+      - datanode1_data:/hadoop/dfs/data
+    ports:
+      - "9864:9864"
+    command: ["/bin/bash", "/start-datanode.sh"]
+    networks:
+      - datalab
+
+  datanode2:
+    image: apache/hadoop:3.5.0
+    profiles: [hadoop]
+    container_name: datanode2
+    hostname: datanode2
+    user: root
+    restart: unless-stopped
+    depends_on:
+      - namenode
+    volumes:
+      - ./hadoop-conf:/opt/hadoop/etc/hadoop:ro
+      - ./scripts/start-datanode.sh:/start-datanode.sh:ro
+      - datanode2_data:/hadoop/dfs/data
+    ports:
+      - "9865:9864"
+    command: ["/bin/bash", "/start-datanode.sh"]
+    networks:
+      - datalab
+
+volumes:
+  namenode_data:
+  datanode1_data:
+  datanode2_data:
+
+networks:
+  datalab:
+    external: true
+    name: datalab

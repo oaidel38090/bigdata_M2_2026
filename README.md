@@ -94,7 +94,7 @@ La procédure ci-dessous s’applique à l’environnement VS Code.
 Indiquez ensuite l’URL du dépôt fournie par le responsable du cours ou l’enseignant, puis cliquez sur “URL de dépôt” :
 
 ```text
-BGM2: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@github.com:oaidel38090/architecture_distribuee_2026.git
+https://BGM2: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@github.com/oaidel38090/bigdata_M2_2026.git
 ```
 
 En cas d’échec, vérifiez bien l’URL avant de la copier-coller, car des caractères spéciaux peuvent parfois être introduits lors du transfert.

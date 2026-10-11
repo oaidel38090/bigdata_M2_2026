@@ -3,6 +3,7 @@ services:
   clickhouse-01:
     image: clickhouse/clickhouse-server:25.8
     container_name: clickhouse-01
+    profiles: [clickhouse]
     hostname: clickhouse-01
     ports:
       - "8123:8123"
@@ -27,6 +28,7 @@ services:
 
   clickhouse-02:
     image: clickhouse/clickhouse-server:25.8
+    profiles: [clickhouse]
     container_name: clickhouse-02
     hostname: clickhouse-02
     ports:
@@ -52,6 +54,7 @@ services:
 
   clickhouse-03:
     image: clickhouse/clickhouse-server:25.8
+    profiles: [clickhouse]
     container_name: clickhouse-03
     hostname: clickhouse-03
     ports:
@@ -78,6 +81,7 @@ services:
   clickhouse-keeper:
     image: clickhouse/clickhouse-keeper:25.8
     container_name: clickhouse-keeper
+    profiles: [clickhouse]
     hostname: clickhouse-keeper
     ports:
       - "9181:9181"

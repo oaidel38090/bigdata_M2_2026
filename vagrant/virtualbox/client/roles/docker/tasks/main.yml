@@ -89,31 +89,26 @@
   community.docker.docker_network:
     name: datalab
 
-- name: Pull images s3
+- name: Pull Docker images for compose projects with profiles
   ansible.builtin.command:
-    cmd: docker compose pull --ignore-pull-failures
-    chdir: /monpc/vagrant/docker/s3
+    cmd: >
+      docker compose
+      {% for profile in item.profiles %}--profile {{ profile }} {% endfor %}
+      pull --ignore-pull-failures
+    chdir: "{{ item.dir }}"
+  loop:
+    - { dir: '/monpc/vagrant/docker/redis', profiles: ['redis', 'redisharding'] }
+    - { dir: '/monpc/vagrant/docker/spark', profiles: ['spark'] }
+    - { dir: '/monpc/vagrant/docker/s3', profiles: ['s3'] }
+    - { dir: '/monpc/vagrant/docker/pgdw', profiles: ['pgdw'] }
+    - { dir: '/monpc/vagrant/docker/mongo', profiles: ['mongo'] }
+    - { dir: '/monpc/vagrant/docker/clickhouse', profiles: ['clickhouse'] }
+    - { dir: '/monpc/vagrant/docker/neo4j', profiles: ['neo4j'] }
+    - { dir: '/monpc/vagrant/docker/hadoop', profiles: ['hadoop'] }
+    - { dir: '/monpc/vagrant/docker/jupyterlab', profiles: [] }
 
 - name: Start Jupyter stack
   community.docker.docker_compose_v2:
     project_src: /monpc/vagrant/docker/jupyterlab
     state: present
-
-- name: Pull images
-  ansible.builtin.find:
-    paths: /monpc/vagrant/docker
-    patterns: "docker-compose.yml"
-    recurse: true
-  register: compose_files
-
-- name: Show found files
-  debug:
-    msg: "{{ item.path }}"
-  loop: "{{ compose_files.files }}"
-
-- name: Pull images for each compose project
-  ansible.builtin.command:
-    cmd: docker compose pull
-    chdir: "{{ item.path | dirname }}"
-  loop: "{{ compose_files.files }}"
 

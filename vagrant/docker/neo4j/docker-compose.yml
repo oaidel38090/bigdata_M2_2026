@@ -25,10 +25,10 @@ services:
   #   networks:
   #     - datalab
 
-networks:      
+networks:
   datalab:
-    driver: bridge
+    external: true
     name: datalab
-  
+
 volumes:
   neo4j-data:

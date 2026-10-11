@@ -90,8 +90,8 @@ services:
 
 networks:
   datalab:
+    external: true
     name: datalab
-    driver: bridge
 
 volumes:
   clickhouse_data_01:

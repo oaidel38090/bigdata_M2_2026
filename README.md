@@ -120,7 +120,7 @@ $GITDIR = /mon/repertoire/de/cours
 ou avec un client git classique :
 
 ```
-git clone https://ynov_ad_2026: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@github.com/oaidel38090/architecture_distribuee_2026.git
+git clone https://github.com/oaidel38090/bigdata_M2_2026.git
 ```
 
 

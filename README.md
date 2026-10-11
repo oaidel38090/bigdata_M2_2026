@@ -79,52 +79,7 @@ vagrant --version
 
 Les supports de cours et les travaux pratiques sont hébergés dans un dépôt Git. Pour accéder aux ressources du module, vous devez cloner ce dépôt localement sur votre ordinateur à l’aide d’un client Git.
 
-### 3.2. Clonage du dépôt Git
-
-À partir de votre client Git, clonez le dépôt de la formation.
-
-La procédure ci-dessous s’applique à l’environnement VS Code.
-
-Étape 1 : cliquez sur l’onglet “Contrôle de code source” dans la barre latérale gauche :
-
-![image.png](./images/installation_3.png)
-
-Étape 2 : cliquez sur le bouton “Cloner le dépôt”.
-
-Indiquez ensuite l’URL du dépôt fournie par le responsable du cours ou l’enseignant, puis cliquez sur “URL de dépôt” :
-
-```text
-https://BGM2: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@github.com/oaidel38090/bigdata_M2_2026.git
-```
-
-En cas d’échec, vérifiez bien l’URL avant de la copier-coller, car des caractères spéciaux peuvent parfois être introduits lors du transfert.
-
-![image.png](./images/installation_4.png)
-
-Une boîte de dialogue s’ouvre alors pour vous permettre de choisir l’emplacement de stockage du dépôt local. L’emplacement sélectionné est référencé comme le GITDIR.
-
-Exemple :
-
-```bash
-$GITDIR = /mon/repertoire/de/cours
-```
-
-![image.png](./images/installation_5.png)
-
-Si vous utilisez un client Git classique, la commande de clonage est la suivante :
-
-```bash
-cd $GITDIR
-git clone https://BGM2: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@github.com/oaidel38090/bigdata_M2_2026.git
-```
-
-L’ensemble du contenu de la formation sera téléchargé sur votre ordinateur :
-
-- Les supports de cours
-- Les TP
-- La configuration de votre VM à appliquer avec Vagrant
-
-### 3.3. Mise à jour des supports
+### 3.2  Mise à jour des supports
 
 Les éléments du projet sont régulièrement mis à jour tout au long du module. Vous serez donc amené à mettre à jour votre dépôt Git local.
 

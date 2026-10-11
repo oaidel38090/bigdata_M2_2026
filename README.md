@@ -114,6 +114,7 @@ $GITDIR = /mon/repertoire/de/cours
 Si vous utilisez un client Git classique, la commande de clonage est la suivante :
 
 ```bash
+cd $GITDIR
 git clone https://BGM2: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@github.com/oaidel38090/bigdata_M2_2026.git
 ```
 

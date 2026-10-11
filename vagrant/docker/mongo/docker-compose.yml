@@ -235,6 +235,6 @@ volumes:
 
 networks:
   datalab:
-    driver: bridge
+    external: true
     name: datalab
 

@@ -1,225 +1,188 @@
-# Bienvenue dans le module : Administration de bases de données avancées
+# Préparation de votre environnement pour le module Big Data
+
 ---
-## Bienvenue à toutes et à tous !
 
-Dans un monde où chaque application, site web ou service numérique repose sur la donnée, comprendre et maîtriser les bases de données est devenu une compétence essentielle pour tout informaticien.
-Les bases de données sont aujourd’hui le cœur du système d’information : elles centralisent, sécurisent et structurent les données pour permettre leur exploitation, leur analyse et leur valorisation.
-Qu’il s’agisse d’un réseau social, d’une plateforme de e-commerce, d’un service bancaire ou d’une application scientifique, aucune solution numérique ne peut fonctionner sans une base de données fiable et bien administrée.
+## Introduction au module Big Data
 
-L’administrateur de bases de données (ou DBA) joue donc un rôle clé : il garantit la disponibilité, la performance, la sécurité et la cohérence de ces systèmes.
-Avec PostgreSQL, l’un des SGBD open source les plus puissants et les plus utilisés, vous allez explorer concrètement les principes fondamentaux à connaitre avec des travaux pratiques.
+Dans le cadre de ce module, vous allez travailler sur un environnement de type Big Data dans une architecture virtualisée. Les travaux pratiques s’appuient sur une machine virtuelle préconfigurée afin de garantir un cadre homogène pour tous les étudiants.
 
+Cette section vous guide dans la mise en place de l’environnement nécessaire, ainsi que dans la récupération des supports de cours et des TPs.
 
+---
 
-## OBJECTIFS PEDAGOGIQUES
+## 1. Prérequis
 
-Ce module vous guidera à travers les grands principes de l’administration PostgreSQL, depuis la conception jusqu’à la sécurisation des systèmes.
-Vous apprendrez à :
-* Comprendre l'architecture d'un SGBD
-* Gérer les niveaux d'isolation
-* Concevoir des contraintes d'intégrité avancées
-* Interpréter l'exécution d'une requête
-* Contrôler les accès et gérer les rôles (DCL) pour garantir la confidentialité et l’intégrité des données.
-*	Gérer les sauvegardes et restaurations pour assurer la résilience et la continuité du service.
+Les travaux pratiques du module s’appuient sur un environnement virtualisé avec une machine virtuelle déjà configurée.
 
+Pour suivre ce module dans de bonnes conditions, vous devez disposer d’un ordinateur ayant au moins les ressources suivantes :
 
-## 1 - Prérequis
+- Plus de 8 Go de RAM
+- Plus de 8 cœurs
+- Plus de 30 Go d’espace disque libre
 
-Les travaux pratiques du module s'appuieront sur un environnement virtualisé avec une machine virtuelle déjà configurée.
+Vous devez également disposer des droits d’administrateur sur votre machine. Cela est nécessaire pour installer et utiliser les outils de virtualisation et de gestion de la VM.
 
-Pour ce module, vous devrez disposer d'un ordinateur ayant **au moins** les ressources suivantes :
+Pour faciliter le déploiement de la machine virtuelle, nous utilisons la solution Vagrant. L’ensemble des outils nécessaires au module est décrit dans ce document.
 
-- Plus de 4 Go de RAM
-- Plus de 4 cœurs
-- Plus de 10 Go d'espace disque libre
+Les commandes précédées du mot “bash” sont des commandes à exécuter dans un terminal shell ou PowerShell selon votre système d’exploitation.
 
-En termes de privilèges, vous devrez disposer des droits d'administrateur sur votre machine. Pour faciliter le déploiement de votre VM, nous nous appuierons sur la solution Vagrant. L'ensemble des outils nécessaires à ce module sont décrits dans ce document.
+Exemple :
 
-Toutes les commandes précédées du mot 'bash' représenteront des commandes à exécuter dans un client shell ou PowerShell selon votre système d'exploitation.
-Par exemple, la cellule suivante indique que la commande ls devra être exécutée dans un client shell :
-
-```
-bash
+```bash
 ls
 ```
 
-## 2 - Environnement virtuel
+---
 
-Pour déployer et configurer votre machine virtuelle (VM), je s'occupe de tout tu s'occupe de rien ;-).
+## 2. Environnement virtuel
 
-Afin d’assurer la compatibilité de la formation avec les différentes architectures de processeurs, y compris pour les étudiants utilisant des Mac équipés de puces ARM de nouvelle génération, nous adopterons une solution combinée basée sur Vagrant et d'une solution de virtualisation VMware ou VirtualBox. Cela nous permettra de contourner les problèmes d’environnement et de nous focaliser sur l'essentiel de la formation.
+Pour déployer et configurer votre machine virtuelle (VM), nous utilisons une combinaison de Vagrant et de VirtualBox. Cette solution permet de garantir la compatibilité avec les différentes architectures de processeurs, notamment pour les étudiants équipés de Mac avec puce ARM.
 
+L’objectif est de vous permettre de vous concentrer sur le contenu pédagogique sans être bloqué par des problèmes d’environnement.
 
-### 3 - Logiciel de virtualisation : VirtualBox
+### 2.1. Logiciel de virtualisation : VirtualBox
 
-Télécharger et installer VirtualBox selon que vous soyez sur Windows ou MAC OSX.
+Téléchargez et installez VirtualBox selon votre système d’exploitation :
 
-https://www.virtualbox.org/wiki/Downloads
+- Windows
+- macOS
 
+Lien officiel : https://www.virtualbox.org/wiki/Downloads
 
-## 4 Vagrant
+### 2.2. Vagrant
 
-Vagrant est un logiciel anciennement libre et open-source pour la création et la configuration des environnements de développement virtuels.
+Vagrant est un outil libre et open-source permettant de créer et de configurer des environnements de développement virtuels.
 
-### 4.1 Installation de Vagrant
+Étape 1 : télécharger le fichier d’installation de Vagrant depuis le site officiel :
 
+https://www.vagrantup.com/downloads
 
-**Étape 1 :** Télécharger le fichier d'installation de Vagrant depuis [le site officiel](https://www.vagrantup.com/downloads).
+Étape 2 : installer Vagrant à partir du fichier téléchargé selon votre système d’exploitation.
 
-**Étape 2 :** Installez Vagrant à partir du fichier téléchargé en fonction de votre système d'exploitation.
+L’exécutable de Vagrant sera ajouté automatiquement à votre chemin système, ce qui vous permettra de l’utiliser directement depuis un terminal shell ou PowerShell.
 
-L'exécutable de Vagrant sera automatiquement ajouté à votre chemin système, vous permettant ainsi d'utiliser la commande vagrant à partir d'un terminal ssh ou powershell si vous êtes sous Windows.
+Votre environnement de virtualisation est désormais prêt.
 
-Votre environnement de virtualisation est à présent prêt.
+Étape 3 : une fois l’installation terminée, redémarrez votre ordinateur afin de vous assurer que les variables d’environnement ont bien été mises à jour.
 
+Étape 4 : pour vérifier l’installation de Vagrant, exécutez la commande suivante dans un terminal shell ou PowerShell :
 
-**Étape 4 :** Une fois l’installation terminée, redémarrez votre ordinateur pour vous assurer que les variables d’environnement ont bien été mises à jour.
-
-**Étape 5 :** Pour vérifier l'installation de Vagrant, exécutez la commande suivante dans un terminal ssh ou powershell pour obtenir la version de votre vagrant :
-
-```
-bash
+```bash
 vagrant --version
 ```
 
- ## 5 Support de cours et TP
+---
 
-### Introduction
+## 3. Supports de cours et TP
 
-Les TPs et les cours sont hébergés dans un projet gitlab.
-Pour accéder au cours et TP, vous devrez cloner le projet gitlab en local sur votre ordinateur avec un client git.
-Le clonage du projet git peut être réalisé à partir d'un client git quelconque comme votre IDE.
+### 3.1. Introduction
 
+Les supports de cours et les travaux pratiques sont hébergés dans un dépôt Git. Pour accéder aux ressources du module, vous devez cloner ce dépôt localement sur votre ordinateur à l’aide d’un client Git.
 
-### 5.1 Clonage du repo gitlab
+### 3.2. Clonage du dépôt Git
 
-A partir de votre client `git` cloner le repo gitlab de la formation.
-La procédure décrite ci-dessous s'applique uniquement pour VS Code.
+À partir de votre client Git, clonez le dépôt de la formation.
 
-Cliquer dans le menu de gauche sur l'onglet `Contrôle de code source`:
+La procédure ci-dessous s’applique à l’environnement VS Code.
+
+Étape 1 : cliquez sur l’onglet “Contrôle de code source” dans la barre latérale gauche :
 
 ![image.png](./images/installation_3.png)
 
-Cliquer sur le bouton `Cloner le dépôt`, indiquer le dépôt `https://bigdata_M2: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@gitlab.com/guizmo38/bdd-av-m1-2026.git` et cliquer sur `URL de dépôt`   :
+Étape 2 : cliquez sur le bouton “Cloner le dépôt”.
 
+Indiquez ensuite l’URL du dépôt fournie par le responsable du cours ou l’enseignant, puis cliquez sur “URL de dépôt” :
+
+```text
+BGM2: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@github.com:oaidel38090/architecture_distribuee_2026.git
+```
+
+En cas d’échec, vérifiez bien l’URL avant de la copier-coller, car des caractères spéciaux peuvent parfois être introduits lors du transfert.
 
 ![image.png](./images/installation_4.png)
 
+Une boîte de dialogue s’ouvre alors pour vous permettre de choisir l’emplacement de stockage du dépôt local. L’emplacement sélectionné est référencé comme le GITDIR.
 
-Une boite de dialogue s'ouvre pour identifier l'emplacement où sera stocké votre repo local :
-L'emplacement selectionné sera référencé comme le `GITDIR`.
+Exemple :
 
-```
+```bash
 $GITDIR = /mon/repertoire/de/cours
 ```
 
 ![image.png](./images/installation_5.png)
 
+Si vous utilisez un client Git classique, la commande de clonage est la suivante :
 
-L'ensemble du contenu de la formation sera téléchargé sur votre ordinateur :
-* Les supports de cours
-* Les TP
-* La configuration de votre VM à appliquer par vagrant
+```bash
+git clone https://BGM2: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@github.com/oaidel38090/bigdata_M2_2026.git
+```
 
-### 5.2 Mise à jour des supports
+L’ensemble du contenu de la formation sera téléchargé sur votre ordinateur :
 
-L'ensemble des éléments du projet sera régulièrement mis à jour tout au long du module, vous serez donc amené à mettre à jour votre repo git local.
+- Les supports de cours
+- Les TP
+- La configuration de votre VM à appliquer avec Vagrant
 
-Pour mettre à jour le contenu de la formation, il vous suffira de vous rendre dans l'onglet `Contrôle de code source` puis de `tirer` les derniers changements :
+### 3.3. Mise à jour des supports
 
+Les éléments du projet sont régulièrement mis à jour tout au long du module. Vous serez donc amené à mettre à jour votre dépôt Git local.
+
+Pour récupérer les derniers changements, rendez-vous dans l’onglet “Contrôle de code source”, puis cliquez sur “Tirer les derniers changements” :
 
 ![image.png](./images/installation_6.png)
 
+Important : afin d’éviter les conflits avec les mises à jour qui seront apportées tout au long du module, il vous est demandé de copier les TP dans le répertoire MES_TPS avant de commencer à les travailler.
 
-Notez que pour ne pas entrer en conflit avec les mises à jour qui seront apportées tout au long du module, il vous est demandé avant de travailler sur un TP de le copier dans le répertoire MES_TPS.
+Bravo, vous êtes désormais prêt à suivre le module.
 
-Bravo, vous êtes à présent prêt à suivre le module.
+---
 
+## 4. Gestion de la VM
 
+Pour les travaux pratiques, nous utiliserons une machine virtuelle. La VM s’appuie sur une image disponible sur Vagrant Cloud. Pour faciliter le déroulement de la formation, une configuration de la VM est disponible dans le dépôt Git, dans le répertoire vagrant/virtualbox.
 
-## 6 Déploiement de la VM
+### 4.1. Démarrage de la VM
 
-Pour les TP, nous utiliserons une à plusieurs machines virtuelles. la VM s'appuiera sur une image disponible sur [vagrantCloud](https://app.vagrantup.com/boxes/search).
-Pour faciliter le déroulement de la formation, une configuration de la VM est disponible dans votre repo gitlab dans le répertoire vagrant/vmware.
+Pour déployer votre VM, ouvrez un terminal PowerShell ou shell, puis exécutez la commande suivante :
 
-Pour déployer votre VM, il vous suffit d'ouvrir un terminal powershel/ shell puis de lancer la commande suivante :
-
-```
-cd $GITDIR/vagrant/virtualbox
+```bash
+cd $GITDIR/vagrant/virtualbox/client
 vagrant up
 ```
 
-Cette commande s'occupe de télécharger l'image de la VM, de la configurer puis de la démarrer.
+Cette commande télécharge l’image de la VM, la configure puis la démarre.
 
-Vérifier l'état de votre VM avec la commande suivante :
+Pour vérifier l’état de votre VM, exécutez :
 
-```
+```bash
 vagrant global-status
 ```
 
+Docker sera installé au préalable sur votre VM, et l’ensemble des images utilisées dans le module sera automatiquement téléchargé.
 
+Si l’installation s’est correctement déroulée, vous devriez pouvoir accéder au service JupyterLab à l’adresse suivante :
 
-### 6.1 Tester votre VM
+[http://192.168.56.30:9999/lab](http://192.168.56.30:9999/lab)
 
+### 4.2. Arrêt de la VM
 
-Pour vérifier le bon fonctionnement de votre VM, ouvrez un terminal (vous pouvez utiliser celui utiliser pour le vagrant up) pour vous positionner dans `$GITDIR/vagrant/virtualbox/` et exécuter la commande `vagrant ssh` pour vous connecter en ssh sur votre VM.
+Une fois votre VM opérationnelle, vous pouvez l’arrêter avec la commande suivante :
 
-
-```
-cd $GITDIR/vagrant/virtualbox/
-vagrant ssh
-```
-
-![image.png](./images/vagrant_ssh.png)
-
-
-Vérifier que les services Postgresql, Jupyterlab et Docker sont en cours d'exécution :
-
-```
-systemctl status jupyterlab
-```
-
-![image.png](./images/vagrant_jupyter.png)
-
-```
-systemctl status postgresql
-```
-
-![image.png](./images/vagrant_pgsql.png)
-
-
-```
-systemctl status docker
-```
-
-![image.png](./images/vagrant_docker.png)
-
-Bravo votre environnement est opérationnel !!!
-
-Vous pouvez à présent arrêter votre VM en utilisant la commande `vagrant halt` :
-
-```
-exit
+```bash
+cd $GITDIR/vagrant/virtualbox/client
 vagrant halt
 ```
 
-![image.png](./images/vagrant_halt.png)
+### 4.3. Suppression de la VM
 
-A la fin de la formation, vous pourrez supprimer votre VM avec la commande suivante :
+À la fin de la formation, vous pouvez supprimer votre VM avec la commande suivante :
 
-* Si vous utilistez virtualBox ;
-
-```
-cd $GITDIR/vagrant/virtualbox
+```bash
+cd $GITDIR/vagrant/virtualbox/client
 vagrant destroy
 ```
 
-* Si vous utilistez VMware ;
+---
 
-```
-cd $GITDIR/vagrant/vmware
-vagrant destroy
-```
+Vous êtes maintenant prêt à commencer le module Big Data.
 
-
-Vous êtes à présent prêt pour le module !!!

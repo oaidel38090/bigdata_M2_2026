@@ -99,7 +99,7 @@ Cliquer dans le menu de gauche sur l'onglet `Contrôle de code source`:
 
 ![image.png](./images/installation_3.png)
 
-Cliquer sur le bouton `Cloner le dépôt`, indiquer le dépôt `https://ynov_ad_2026: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@github.com:oaidel38090/architecture_distribuee_2026.git` et cliquer sur `URL de dépôt`   :
+Cliquer sur le bouton `Cloner le dépôt`, indiquer le dépôt `https://github.com/oaidel38090/bigdata_M2_2026.git` et cliquer sur `URL de dépôt`   :
 
 En cas d'échec, merci de bien vérifier l'url du dépôt lors du copier/coller des caractères spéciaux peuvent se glisser.
 

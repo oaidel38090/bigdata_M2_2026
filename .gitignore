@@ -2,10 +2,14 @@
 *Trash
 *.pyc
 *.log
-*.ipynb
 chap7_replication_sharding/*
 chap5_BDD_cle_valeur/*
-*correction.ipynb
+chap6_fragmentation_horizontale/*
+chap5*correction.ipynb
+chap4*.ipynb
+chap6*.ipynb
+chap7*.ipynb
+chap8*.ipynb
 *.ignore.ipynb
 *.vagrant
 **/.ipynb_checkpoints

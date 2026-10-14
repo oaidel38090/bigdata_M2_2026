@@ -60,34 +60,6 @@ services:
     command: >
       mongoimport --uri 'mongodb://mongosingle:27017' --drop -d singlepattern -c users --jsonArray /dataimport/users.json
 
-  loaddatareviewsintomongosingle:
-    image: mongo:4.4.6
-    # this container will exit after executing the command
-    restart: "no"
-    profiles: [mongo]
-    depends_on:
-      - mongosingle
-    volumes:
-      - ./mongodb:/dataimport
-    networks:
-      - datalab
-    command: >
-      mongoimport --uri 'mongodb://mongosingle:27017' --drop -d singlepattern -c reviews --jsonArray /dataimport/reviews.json
-
-  loaddatabooksintomongosingle:
-    profiles: [mongo]
-    image: mongo:4.4.6
-    # this container will exit after executing the command
-    restart: "no"
-    depends_on:
-      - mongosingle
-    volumes:
-      - ./mongodb:/dataimport
-    networks:
-      - datalab
-    command: >
-      mongoimport --uri 'mongodb://mongosingle:27017' --drop -d singlepattern -c books --jsonArray /dataimport/books.json
-
   loaddatatripsintomongosingle:
     profiles: [mongo]
     image: mongo:4.4.6
@@ -233,8 +205,4 @@ volumes:
   configs2: {}
   configs3: {}
 
-networks:
-  datalab:
-    external: true
-    name: datalab
 

@@ -17,14 +17,3 @@ services:
 
 volumes:
   pgdw_data:
-
-####################################
-# Déclaration du réseau     #
-####################################
-# L'ensemble des containers sera enregistré dans le réseau datalab
-# la résolution de nom sera utilisé pour les communications entre containers
-
-networks:
-  datalab:
-    external: true
-    name: datalab

@@ -26,10 +26,7 @@ services:
   #   networks:
   #     - datalab
 
-networks:
-  datalab:
-    external: true
-    name: datalab
+
 
 volumes:
   neo4j-data:

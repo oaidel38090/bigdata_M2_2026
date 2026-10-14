@@ -75,7 +75,3 @@ services:
     networks:
       - datalab
 
-networks:
-  datalab:
-    external: true
-    name: datalab

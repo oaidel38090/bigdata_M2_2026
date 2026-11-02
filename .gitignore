@@ -3,10 +3,7 @@
 *.pyc
 *.log
 chap7_replication_sharding/*
-chap5_BDD_cle_valeur/*
 chap6_fragmentation_horizontale/*
-chap5*correction.ipynb
-chap4*.ipynb
 chap6*.ipynb
 chap7*.ipynb
 chap8*.ipynb
